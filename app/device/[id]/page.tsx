@@ -20,6 +20,7 @@ function ChatPage({ params: { id } }: Props) {
   const [state, setState] = useState<boolean>();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
+  const [isPresent, setIsPresent] = useState<boolean>(false);
   useEffect(() => {
     fetchData();
   }, [session]);
@@ -34,7 +35,10 @@ function ChatPage({ params: { id } }: Props) {
         setAQI(documentData.AQI);
         setPM2_5(documentData.PM2_5);
         setCO(documentData.CO);
-        setState(documentData.IonGeneratorState);
+        if (documentData.IonGeneratorState) {
+          setState(documentData.IonGeneratorState);
+          setIsPresent(true);
+        }
         setLoading(false);
       } else {
         console.log("No document found!");
@@ -104,23 +108,25 @@ function ChatPage({ params: { id } }: Props) {
               <div>CO-{CO}</div>
             </div>
           </div>
-          <div className="flex items-center  my-2 gap-2 justify-between px-10">
-            <div>{state ? "Ion generator ON" : "Ion generator OFF"}</div>
-            <div
-              className={`relative w-14 h-8  rounded-full cursor-pointer ${
-                state ? "bg-green-500" : "bg-gray-300"
-              }`}
-              onClick={handleToggle}
-              style={{ transition: "background-color 0.3s ease" }}
-            >
+          {isPresent && (
+            <div className="flex items-center  my-2 gap-2 justify-between px-10">
+              <div>{state ? "Ion generator ON" : "Ion generator OFF"}</div>
               <div
-                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md transform ${
-                  state ? "translate-x-6" : "translate-x-0"
+                className={`relative w-14 h-8  rounded-full cursor-pointer ${
+                  state ? "bg-green-500" : "bg-gray-300"
                 }`}
-                style={{ transition: "transform 0.3s ease" }}
-              ></div>
+                onClick={handleToggle}
+                style={{ transition: "background-color 0.3s ease" }}
+              >
+                <div
+                  className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md transform ${
+                    state ? "translate-x-6" : "translate-x-0"
+                  }`}
+                  style={{ transition: "transform 0.3s ease" }}
+                ></div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       ) : (
         <Skeleton />
